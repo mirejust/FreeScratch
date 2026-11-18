@@ -71,6 +71,8 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import coil.compose.AsyncImage
 import com.pintafacil.app.R
+import com.pintafacil.app.i18n.AppLang
+import com.pintafacil.app.i18n.T
 import com.pintafacil.app.util.ImagePicker
 import com.pintafacil.app.util.PixabayApi
 import kotlinx.coroutines.Dispatchers
@@ -133,10 +135,10 @@ fun HomeScreen(
             val bmp = ImagePicker.load(context, uri)
             if (bmp != null) {
                 onReference(bmp.asImageBitmap())
-                notice = "Imagen lista para trazar ✓"
+                notice = T.imgReady
                 error = null
             } else {
-                error = "No se pudo abrir esa imagen"
+                error = T.errOpenImage
             }
         }
     }
@@ -144,7 +146,7 @@ fun HomeScreen(
     val permission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
-        if (granted) onStart() else error = "Necesito la cámara para trazar sobre tu papel"
+        if (granted) onStart() else error = T.errNeedCamera
     }
 
     /**
@@ -160,14 +162,14 @@ fun HomeScreen(
             }
         }
         if (res == null) {
-            if (pageToLoad == 1) error = "No se pudo buscar: revisa tu conexión"
-            else error = "Sin conexión: no se pudo cargar más"
+            if (pageToLoad == 1) error = T.errSearchFail
+            else error = T.errLoadMore
             return
         }
         totalHits = minOf(res.totalHits, PixabayApi.MAX_RESULTS)
         if (pageToLoad == 1) {
             if (res.hits.isEmpty()) {
-                error = "Sin resultados para \"$q\""
+                error = T.noResults(q)
                 results = emptyList()
             } else {
                 results = res.hits
@@ -187,9 +189,8 @@ fun HomeScreen(
     val doSearch: () -> Unit = {
         val q = query.trim()
         when {
-            q.isEmpty() -> error = "Escribe qué quieres buscar"
-            !PixabayApi.isConfigured ->
-                error = "Falta la clave de Pixabay: copia apikeys.properties.example a apikeys.properties y compila de nuevo"
+            q.isEmpty() -> error = T.errEmptyQuery
+            !PixabayApi.isConfigured -> error = T.errNoKey
             else -> {
                 error = null
                 notice = null
@@ -243,9 +244,9 @@ fun HomeScreen(
                 usingVector = false
                 if (bmp != null) {
                     onReference(bmp.asImageBitmap())
-                    notice = "Vector listo para trazar ✓"
+                    notice = T.vectorReady
                 } else {
-                    error = "No se pudo descargar el vector"
+                    error = T.errDownload
                 }
             }
         }
@@ -287,7 +288,15 @@ fun HomeScreen(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(Modifier.height(36.dp))
+            Spacer(Modifier.height(18.dp))
+
+            // Selector de idioma (sobre el logo)
+            LangToggle(
+                current = T.lang,
+                onSelect = { T.set(context, it) },
+            )
+
+            Spacer(Modifier.height(20.dp))
 
             // Icono de la app
             Box(
@@ -314,7 +323,7 @@ fun HomeScreen(
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                "Traza cualquier imagen con la cámara de tu teléfono.\nGratis, sin cuenta y sin que nada salga de tu dispositivo.",
+                T.tagline,
                 color = TextDim,
                 fontSize = 14.5.sp,
                 lineHeight = 21.sp,
@@ -335,7 +344,7 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(14.dp),
                 ) {
                     Text(
-                        "Tu imagen de referencia",
+                        T.cardTitle,
                         color = Color.White,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
@@ -344,7 +353,7 @@ fun HomeScreen(
                     // Selector de fuente: un solo modo activo a la vez
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         SourcePill(
-                            label = "Del teléfono",
+                            label = T.pillPhone,
                             icon = Icons.Default.PhotoLibrary,
                             selected = source == Source.PHONE,
                             modifier = Modifier.weight(1f),
@@ -354,7 +363,7 @@ fun HomeScreen(
                             notice = null
                         }
                         SourcePill(
-                            label = "Templates Pixabay",
+                            label = T.pillPixabay,
                             icon = Icons.Default.AutoAwesome,
                             selected = source == Source.PIXABAY,
                             modifier = Modifier.weight(1f),
@@ -389,7 +398,7 @@ fun HomeScreen(
                         if (reference != null) {
                             Image(
                                 bitmap = reference,
-                                contentDescription = "Imagen de referencia",
+                                contentDescription = T.refImageDesc,
                                 modifier = Modifier
                                     .padding(12.dp)
                                     .fillMaxSize()
@@ -408,8 +417,8 @@ fun HomeScreen(
                                     modifier = Modifier.size(40.dp),
                                 )
                                 Text(
-                                    if (source == Source.PHONE) "Toca \"Elegir imagen\" para empezar"
-                                    else "Busca un dibujo en Pixabay",
+                                    if (source == Source.PHONE) T.emptyPhone
+                                    else T.emptyPixabay,
                                     color = Color(0xFF8B82AD),
                                     fontSize = 13.5.sp,
                                     textAlign = TextAlign.Center,
@@ -421,7 +430,7 @@ fun HomeScreen(
                     // ---- Controles según la fuente elegida ----
                     when (source) {
                         Source.PHONE -> GradientButton(
-                            text = if (reference != null) "Cambiar imagen" else "Elegir imagen",
+                            text = if (reference != null) T.changeImage else T.pickImage,
                             icon = Icons.Default.PhotoLibrary,
                             onClick = { gallery.launch(arrayOf("image/*")) },
                         )
@@ -439,7 +448,7 @@ fun HomeScreen(
                                     onValueChange = { query = it },
                                     singleLine = true,
                                     placeholder = {
-                                        Text("Ej: dinosaurio, gato…", color = Color(0xFF8B82AD), fontSize = 14.sp)
+                                        Text(T.searchHint, color = Color(0xFF8B82AD), fontSize = 14.sp)
                                     },
                                     textStyle = androidx.compose.ui.text.TextStyle(
                                         color = Color.White,
@@ -472,7 +481,7 @@ fun HomeScreen(
                                     } else {
                                         Icon(
                                             Icons.Default.Search,
-                                            contentDescription = "Buscar en Pixabay",
+                                            contentDescription = T.searchDesc,
                                             tint = Color(0xFF1B1035),
                                         )
                                     }
@@ -514,7 +523,7 @@ fun HomeScreen(
                                                 )
                                                 Spacer(Modifier.width(8.dp))
                                                 Text(
-                                                    "Cargando más…",
+                                                    T.loadingMore,
                                                     color = TextDim,
                                                     fontSize = 12.sp,
                                                 )
@@ -529,14 +538,14 @@ fun HomeScreen(
                                                 contentAlignment = Alignment.Center,
                                             ) {
                                                 Text(
-                                                    "Cargar más resultados (${results.size} de $totalHits)",
+                                                    T.loadMore(results.size, totalHits),
                                                     color = Yellow,
                                                     fontSize = 12.5.sp,
                                                     fontWeight = FontWeight.Medium,
                                                 )
                                             }
                                             else -> Text(
-                                                "Mostrando los ${results.size} primeros resultados",
+                                                T.showingFirst(results.size),
                                                 color = Color(0xFF8B82AD),
                                                 fontSize = 11.5.sp,
                                                 textAlign = TextAlign.Center,
@@ -546,7 +555,7 @@ fun HomeScreen(
                                 }
 
                                 Text(
-                                    "Vectores cortesía de Pixabay",
+                                    T.credit,
                                     color = Color(0xFF8B82AD),
                                     fontSize = 11.sp,
                                     textAlign = TextAlign.Center,
@@ -554,7 +563,7 @@ fun HomeScreen(
                                 )
 
                                 GradientButton(
-                                    text = if (usingVector) "Descargando…" else "Usar este vector",
+                                    text = if (usingVector) T.downloading else T.useVector,
                                     icon = Icons.Default.Check,
                                     big = true,
                                     enabled = selectedHit != null && !usingVector,
@@ -563,7 +572,7 @@ fun HomeScreen(
                                 )
                             } else if (!searching) {
                                 Text(
-                                    "Escribe una palabra y toca el botón de buscar\npara ver vectores para trazar.",
+                                    T.searchEmptyHint,
                                     color = Color(0xFF8B82AD),
                                     fontSize = 13.sp,
                                     textAlign = TextAlign.Center,
@@ -579,12 +588,12 @@ fun HomeScreen(
 
             // CTA principal
             GradientButton(
-                text = "Abrir cámara",
+                text = T.openCamera,
                 icon = Icons.Default.PhotoCamera,
                 big = true,
                 onClick = {
                     if (reference == null) {
-                        error = "Primero elige o busca una imagen"
+                        error = T.errNoRef
                     } else {
                         val granted = ContextCompat.checkSelfPermission(
                             context, Manifest.permission.CAMERA
@@ -598,9 +607,9 @@ fun HomeScreen(
 
             // Chips de confianza
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                InfoChip("Sin cuenta")
-                InfoChip("100% local")
-                InfoChip("Gratis")
+                InfoChip(T.chipNoAccount)
+                InfoChip(T.chipLocal)
+                InfoChip(T.chipFree)
             }
 
             notice?.let {
@@ -760,5 +769,66 @@ private fun InfoChip(text: String) {
             .padding(horizontal = 14.dp, vertical = 7.dp),
     ) {
         Text(text, color = TextDim, fontSize = 12.5.sp, fontWeight = FontWeight.Medium)
+    }
+}
+
+/**
+ * Selector de idioma con banderitas (🇬🇧 EN / 🇪🇸 ES), colocado
+ * encima del logo. El idioma elegido se guarda y arranca en inglés.
+ */
+@Composable
+private fun LangToggle(
+    current: AppLang,
+    onSelect: (AppLang) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(Color(0x1FFFFFFF))
+            .border(1.dp, Color(0x33FFFFFF), RoundedCornerShape(50))
+            .padding(3.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        LangSegment(
+            text = T.langEn,
+            selected = current == AppLang.EN,
+            onClick = { onSelect(AppLang.EN) },
+        )
+        LangSegment(
+            text = T.langEs,
+            selected = current == AppLang.ES,
+            onClick = { onSelect(AppLang.ES) },
+        )
+    }
+}
+
+/** Cada mitad del selector: bandera + código de idioma. */
+@Composable
+private fun LangSegment(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(
+                brush = if (selected) {
+                    Brush.horizontalGradient(Gradient)
+                } else {
+                    Brush.horizontalGradient(listOf(Color(0x00FFFFFF), Color(0x00FFFFFF)))
+                },
+                shape = CircleShape,
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text,
+            color = if (selected) Color(0xFF1B1035) else TextDim,
+            fontSize = 12.5.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+        )
     }
 }

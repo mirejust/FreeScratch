@@ -56,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pintafacil.app.R
+import com.pintafacil.app.i18n.T
 import com.pintafacil.app.overlay.OverlayState
 
 /** Colores del dock (parte inferior clara, estilo AR Drawing). */
@@ -69,12 +70,21 @@ object Ui {
     val Yellow = Color(0xFFFFD23F)
 }
 
-enum class DockTab(val label: String) {
-    OPACITY("Opacidad"),
-    SCALING("Escalar"),
-    TOOLS("Trazar"),
-    CAMERA("Cámara"),
-    FLASH("Flash"),
+/** Pestañas del dock; las etiquetas siguen el idioma activo (T.lang). */
+enum class DockTab {
+    OPACITY,
+    SCALING,
+    TOOLS,
+    CAMERA,
+    FLASH;
+
+    fun label(): String = when (this) {
+        OPACITY -> T.tabOpacity
+        SCALING -> T.tabScaling
+        TOOLS -> T.tabTools
+        CAMERA -> T.tabCamera
+        FLASH -> T.tabFlash
+    }
 }
 
 /**
@@ -100,14 +110,14 @@ fun TracerTopBar(
         ) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Salir",
+                contentDescription = T.exit,
                 tint = Color.White.copy(alpha = 0.45f),
             )
         }
 
         TextButton(onClick = onDone, modifier = Modifier.align(Alignment.CenterEnd).padding(end = 6.dp)) {
             Text(
-                "Hecho",
+                T.done,
                 color = Color.White.copy(alpha = 0.45f),
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp,
@@ -167,8 +177,8 @@ fun UndoRedoRow(
             .padding(horizontal = 8.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        CircleIconButton(Icons.Default.Undo, "Deshacer", canUndo, onUndo)
-        CircleIconButton(Icons.Default.Redo, "Rehacer", canRedo, onRedo)
+        CircleIconButton(Icons.Default.Undo, T.undo, canUndo, onUndo)
+        CircleIconButton(Icons.Default.Redo, T.redo, canRedo, onRedo)
     }
 }
 
@@ -281,7 +291,7 @@ fun TracerBottomDock(
                 IconButton(onClick = onToggleCollapse) {
                     Icon(
                         if (collapsed) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = if (collapsed) "Mostrar ajustes" else "Ocultar ajustes",
+                        contentDescription = if (collapsed) T.showSettings else T.hideSettings,
                         tint = Ui.Ink,
                     )
                 }
@@ -292,7 +302,7 @@ fun TracerBottomDock(
                     DockTab.OPACITY -> {
                         Column(Modifier.padding(horizontal = 18.dp)) {
                             Text(
-                                "Opacidad",
+                                T.tabOpacity,
                                 color = Ui.Ink,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
@@ -315,7 +325,7 @@ fun TracerBottomDock(
                     DockTab.SCALING -> {
                         Column(Modifier.padding(horizontal = 18.dp)) {
                             Text(
-                                "Tamaño",
+                                T.sizeTitle,
                                 color = Ui.Ink,
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
@@ -350,9 +360,9 @@ fun TracerBottomDock(
                             modifier = Modifier.padding(horizontal = 18.dp),
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
-                            DockAction("Voltear", Icons.Default.FlipCameraAndroid, Modifier.weight(1f), onFlip)
+                            DockAction(T.flip, Icons.Default.FlipCameraAndroid, Modifier.weight(1f), onFlip)
                             DockAction(
-                                if (frozen) "Reanudar" else "Congelar",
+                                if (frozen) T.resume else T.freeze,
                                 if (frozen) Icons.Default.PlayArrow else Icons.Default.Pause,
                                 Modifier.weight(1f),
                                 onFreeze,
@@ -367,13 +377,13 @@ fun TracerBottomDock(
                             horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
                             DockAction(
-                                if (torchOn) "Apagar flash" else "Encender flash",
+                                if (torchOn) T.flashTurnOff else T.flashTurnOn,
                                 if (torchOn) Icons.Default.FlashOff else Icons.Default.FlashOn,
                                 Modifier.weight(1f),
                                 onTorch,
                             )
                             Text(
-                                if (torchOn) "Encendido" else "Apagado",
+                                if (torchOn) T.stateOn else T.stateOff,
                                 color = Ui.InkDim,
                                 fontSize = 13.sp,
                                 modifier = Modifier.width(72.dp),
@@ -425,7 +435,7 @@ private fun TabItem(
     ) {
         Icon(tab.icon(), contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
         Text(
-            tab.label,
+            tab.label(),
             color = tint,
             fontSize = 10.sp,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,

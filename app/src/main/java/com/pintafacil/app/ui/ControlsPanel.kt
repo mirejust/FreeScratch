@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.pintafacil.app.i18n.T
 import com.pintafacil.app.overlay.OverlayState
 import com.pintafacil.app.overlay.SurfaceMode
 
@@ -53,7 +54,7 @@ fun ToolsTab(
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Text(
-            "Superficie",
+            T.surface,
             color = Ui.Ink,
             fontSize = 15.sp,
             fontWeight = FontWeight.SemiBold,
@@ -75,7 +76,7 @@ fun ToolsTab(
         }
 
         LabeledSlider(
-            label = "Inclinación",
+            label = T.tilt,
             value = (state.tilt + 60f) / 120f,
             display = "${Math.round(state.tilt)}°",
             onStart = onSliderStart,
@@ -85,7 +86,7 @@ fun ToolsTab(
         }
 
         LabeledSlider(
-            label = "Giro",
+            label = T.rotate,
             value = (state.turn + 180f) / 360f,
             display = "${Math.round(state.turn)}°",
             onStart = onSliderStart,
@@ -95,15 +96,15 @@ fun ToolsTab(
         }
 
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ToolButton("Detectar", Icons.Default.MyLocation, Modifier.weight(1f), onDetect)
-            ToolButton("Esquinas", Icons.Default.Refresh, Modifier.weight(1f), onCorners)
+            ToolButton(T.detect, Icons.Default.MyLocation, Modifier.weight(1f), onDetect)
+            ToolButton(T.corners, Icons.Default.Refresh, Modifier.weight(1f), onCorners)
         }
 
         OutlinedButton(
             onClick = onReset,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(14.dp),
-        ) { Text("Reiniciar todo", maxLines = 1, color = Ui.Ink) }
+        ) { Text(T.resetAll, maxLines = 1, color = Ui.Ink) }
 
         Spacer(Modifier.height(4.dp))
     }
@@ -158,8 +159,8 @@ private fun ToolButton(label: String, icon: androidx.compose.ui.graphics.vector.
 }
 
 private fun SurfaceMode.label(): String = when (this) {
-    SurfaceMode.FLAT -> "Plano"
-    SurfaceMode.CUP -> "Vaso"
-    SurfaceMode.ROLLER -> "Rodillo"
-    SurfaceMode.BALL -> "Pelota"
+    SurfaceMode.FLAT -> T.surfaceFlat
+    SurfaceMode.CUP -> T.surfaceCup
+    SurfaceMode.ROLLER -> T.surfaceRoller
+    SurfaceMode.BALL -> T.surfaceBall
 }

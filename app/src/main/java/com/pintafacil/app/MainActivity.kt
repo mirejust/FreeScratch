@@ -12,6 +12,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.pintafacil.app.i18n.T
 import com.pintafacil.app.ui.AppRoot
 import com.pintafacil.app.ui.HomeScreen
 import com.pintafacil.app.ui.TracerScreen
@@ -20,6 +21,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        T.load(this)
         setContent {
             MaterialTheme(colorScheme = darkColorScheme(
                 primary = Color(0xFFFFD23F),

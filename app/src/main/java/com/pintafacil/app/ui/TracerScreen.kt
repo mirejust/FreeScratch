@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import com.pintafacil.app.detect.SurfaceDetector
+import com.pintafacil.app.i18n.T
 import com.pintafacil.app.overlay.OverlayRenderer
 import com.pintafacil.app.overlay.OverlayState
 import com.pintafacil.app.overlay.SurfaceMode
@@ -227,7 +228,7 @@ fun TracerScreen(
                     }
                 }
             } catch (e: Exception) {
-                detectMsg = "No se pudo abrir la cámara"
+                detectMsg = T.errOpenCamera
             }
         }, context.mainExecutor)
 
@@ -246,12 +247,12 @@ fun TracerScreen(
     val toggleTorch = {
         val camera = boundCamera
         when {
-            camera == null -> detectMsg = "La cámara aún no está lista"
-            !camera.cameraInfo.hasFlashUnit() -> detectMsg = "Este teléfono no tiene flash"
+            camera == null -> detectMsg = T.camNotReady
+            !camera.cameraInfo.hasFlashUnit() -> detectMsg = T.noFlash
             else -> {
                 torchOn = !torchOn
                 camera.cameraControl.enableTorch(torchOn)
-                detectMsg = if (torchOn) "Flash encendido" else "Flash apagado"
+                detectMsg = if (torchOn) T.flashOn else T.flashOff
             }
         }
     }
@@ -259,15 +260,15 @@ fun TracerScreen(
     val toggleFreeze = {
         if (frozenFrame != null) {
             frozenFrame = null
-            detectMsg = "Cámara reanudada"
+            detectMsg = T.camResumed
         } else {
             val snapshot = previewView.bitmap
             if (snapshot != null) {
                 frozenFrame = snapshot
                 showGuides = false
-                detectMsg = "Vista congelada: la imagen queda anclada"
+                detectMsg = T.viewFrozen
             } else {
-                detectMsg = "La cámara aún no está lista"
+                detectMsg = T.camNotReady
             }
         }
     }
@@ -284,7 +285,7 @@ fun TracerScreen(
                 center = PointF(cx, cy),
                 corners = overlayState.corners?.map { PointF(it.x + dx, it.y + dy) },
             )
-            detectMsg = "Imagen centrada"
+            detectMsg = T.imageCentered
         }
     }
 
@@ -358,7 +359,7 @@ fun TracerScreen(
             }
             if (overlayHidden) {
                 Text(
-                    "Imagen oculta · mantén presionado el ojo para verla",
+                    T.imageHidden,
                     color = Color(0xFFFFD23F),
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -375,7 +376,7 @@ fun TracerScreen(
             holding = overlayHidden,
             onHoldStart = { overlayHidden = true },
             onHoldEnd = { overlayHidden = false },
-            contentDescription = "Mantén presionado para ocultar la imagen",
+            contentDescription = T.eyeDesc,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .statusBarsPadding()
@@ -410,7 +411,7 @@ fun TracerScreen(
                     // Mover / recentrar (icono de 4 flechas como la referencia)
                     CircleIconButton(
                         icon = Icons.Default.OpenWith,
-                        desc = "Recentrar imagen",
+                        desc = T.recenterDesc,
                         enabled = true,
                         onClick = { recenter() },
                     )
@@ -448,7 +449,7 @@ fun TracerScreen(
                 onDetect = {
                     pushCurrent()
                     detectRequests.set(true)
-                    detectMsg = "Buscando el papel…"
+                    detectMsg = T.lookingPaper
                 },
                 onCorners = {
                     val size = viewSize ?: return@TracerBottomDock
@@ -505,14 +506,14 @@ private fun handleFrame(
             val quad = SurfaceDetector.detect(gray, proxy.width, proxy.height)
             publish(
                 if (quad != null) {
-                    "Papel encontrado. Activa Esquinas para ajustarlo"
+                    T.paperFound
                 } else {
-                    "No vi un papel claro: más luz o toca Esquinas"
+                    T.noPaper
                 }
             )
         }
     } catch (e: Exception) {
-        publish("No se pudo analizar la imagen")
+        publish(T.errAnalyze)
     } finally {
         proxy.close()
     }

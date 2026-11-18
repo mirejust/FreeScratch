@@ -19,6 +19,8 @@ Pixabay, que usa su API pública).
   presets de tamaño (0.5x / 1.0x / 1.5x).
 - **Templates de Pixabay**: busca vectores y dibujos por palabra y
   úsalos como referencia (paginación con carga automática).
+- **English / Español**: selector de idioma con banderitas junto al
+  logo (inglés por defecto, la elección se recuerda).
 - Selector de imagen desde la galería del teléfono.
 
 ## Construcción
