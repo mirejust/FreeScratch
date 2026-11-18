@@ -1,0 +1,14 @@
+# ============================================================
+# Plantilla de claves de API de Free Scratch
+# ------------------------------------------------------------
+# 1. Copia este archivo y renómbralo a: apikeys.properties
+# 2. Sustituye cada valor entre corchetes por tu clave real.
+# 3. apikeys.properties está en .gitignore: NUNCA se sube a
+#    GitHub con las claves dentro.
+#
+# Los APK que se publiquen ya llevan las claves integradas
+# al compilarse con tu apikeys.properties real.
+# ============================================================
+
+# https://pixabay.com/api/docs/
+Pixabay = [Aqui deberas poner tu API de desarrollador]

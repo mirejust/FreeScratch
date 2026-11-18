@@ -1,0 +1,25 @@
+# --- Gradle / Android ---
+.gradle/
+build/
+app/build/
+local.properties
+.cxx/
+.externalNativeBuild/
+captures/
+
+# --- IDE ---
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# --- Sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Claves de API: NUNCA subir a GitHub ---
+apikeys.properties
+
+# --- APKs de salida ---
+Bin/*.apk
+*.apk
