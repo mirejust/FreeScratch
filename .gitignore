@@ -23,3 +23,6 @@ apikeys.properties
 # --- APKs de salida ---
 Bin/*.apk
 *.apk
+
+# --- Vídeos locales: nunca subir ---
+video/

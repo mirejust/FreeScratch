@@ -4,6 +4,8 @@ App Android para **trazar imágenes sobre la cámara en vivo**: elige una
 imagen (de tu teléfono o una plantilla vectorial de Pixabay), projétala
 sobre lo que ve la cámara y dibújala a mano alzada sobre papel.
 
+![Demo: inicio, trazado de la estrella y pestaña de herramientas](media/demo.gif)
+
 Procesamiento **100% local**: sin cuentas, sin servidores propios, la
 cámara y tus imágenes nunca salen del dispositivo (salvo la búsqueda en
 Pixabay, que usa su API pública).
