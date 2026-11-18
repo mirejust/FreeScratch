@@ -556,6 +556,7 @@ fun HomeScreen(
                                 GradientButton(
                                     text = if (usingVector) "Descargando…" else "Usar este vector",
                                     icon = Icons.Default.Check,
+                                    big = true,
                                     enabled = selectedHit != null && !usingVector,
                                     loading = usingVector,
                                     onClick = { useVector() },
@@ -718,12 +719,17 @@ private fun GradientButton(
             .fillMaxWidth()
             .height(if (big) 58.dp else 50.dp)
             .clip(RoundedCornerShape(if (big) 18.dp else 15.dp))
+            // El degradado naranja SIEMPRE se pinta a full (nunca se
+            // atenúa el fondo: sobre el morado se veía casi negro).
             .background(Brush.horizontalGradient(Gradient))
-            .clickable(enabled = enabled && !loading, onClick = onClick)
-            .then(if (enabled) Modifier else Modifier.alpha(0.45f)),
+            .clickable(enabled = enabled && !loading, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            // Solo el contenido se atenúa si está deshabilitado.
+            modifier = Modifier.alpha(if (enabled || loading) 1f else 0.5f),
+        ) {
             if (loading) {
                 CircularProgressIndicator(
                     color = Color(0xFF1B1035),
@@ -738,7 +744,7 @@ private fun GradientButton(
                 text,
                 color = Color(0xFF1B1035),
                 fontSize = if (big) 17.sp else 15.sp,
-                fontWeight = FontWeight.SemiBold,
+                fontWeight = FontWeight.Bold,
             )
         }
     }
